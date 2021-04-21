@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
@@ -16,6 +17,8 @@ func WorkerRedisFib(index string) (int64, error) {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+	pong, err := redisClient.Ping(ctx).Result()
+	fmt.Println(pong, err)
 	val, err := redisClient.Get(ctx, index).Result()
 
 	if err == redis.Nil {
