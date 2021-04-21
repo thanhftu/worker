@@ -27,9 +27,10 @@ func WorkerRedisFib(index string) (int64, error) {
 		if err := redisClient.Set(ctx, index, val64, 0).Err(); err != nil {
 			return val64, errors.New("redis saving error")
 		}
+		return val64, nil
 	}
 	if err != nil {
-		return 0, errors.New("redis error")
+		return 0, errors.New(err.Error())
 	}
 	val64, _ := strconv.ParseInt(val, 10, 64)
 	return val64, nil
