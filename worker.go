@@ -11,11 +11,11 @@ import (
 
 var ctx = context.Background()
 
-func WorkerRedisFib(index string) (int64, error) {
+func WorkerRedisFib(index string, redisUrl string) (int64, error) {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     redisUrl, //"localhost:6379"
+		Password: "",       // no password set
+		DB:       0,        // use default DB
 	})
 	pong, err := redisClient.Ping(ctx).Result()
 	fmt.Println(pong, err)
