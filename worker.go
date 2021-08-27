@@ -11,7 +11,7 @@ import (
 
 var ctx = context.Background()
 
-func WorkerRedisFib(index string, redisUrl string) (int64, error) {
+func WorkerRedisFib(index int64, redisUrl string) (int64, error) {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     redisUrl, //"localhost:6379"
 		Password: "",       // no password set
@@ -19,15 +19,15 @@ func WorkerRedisFib(index string, redisUrl string) (int64, error) {
 	})
 	pong, err := redisClient.Ping(ctx).Result()
 	fmt.Println(pong, err)
-	val, err := redisClient.Get(ctx, index).Result()
+	index_string := strconv.FormatInt(index, 10)
+	val, err := redisClient.Get(ctx, index_string).Result()
 
 	if err == redis.Nil {
-		index64, _ := strconv.ParseInt(index, 10, 64)
-		val64 := fib(index64)
-		if err := redisClient.Set(ctx, index, val64, 0).Err(); err != nil {
-			return val64, errors.New("redis saving error")
+		val := fib(index)
+		if err := redisClient.Set(ctx, index_string, val, 0).Err(); err != nil {
+			return val, errors.New("redis saving error")
 		}
-		return val64, nil
+		return val, nil
 	}
 	if err != nil {
 		return 0, errors.New(err.Error())
@@ -36,14 +36,8 @@ func WorkerRedisFib(index string, redisUrl string) (int64, error) {
 	return val64, nil
 }
 func fib(index int64) int64 {
-	if index < 2 {
+	if index <= 2 {
 		return 1
 	}
 	return fib(index-1) + fib(index-2)
 }
-
-// redisClient
-// sub.on('message', (channel, message) => {
-//   redisClient.hset('values', message, fib(parseInt(message)));
-// });
-// sub.subscribe('insert');
